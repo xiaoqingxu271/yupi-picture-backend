@@ -9,7 +9,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @MapperScan("com.yupi.yupicturebackend.mapper")
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class YuPictureBackendApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(YuPictureBackendApplication.class, args);
     }

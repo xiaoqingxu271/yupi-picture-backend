@@ -212,7 +212,7 @@ public class PictureController {
         }
         // 操作数据库
         boolean result = pictureService.updateById(picture);
-        ThrowUtils.throwIf(result, ErrorCode.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
 
     }

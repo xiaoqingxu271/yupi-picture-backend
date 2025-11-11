@@ -125,6 +125,8 @@ public class PictureController {
         // 查询数据库
         Picture picture = pictureService.getById(id);
         ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+        // 设置User
+        User user = userService.getById(picture.getUserId());
         return ResultUtils.success(picture);
     }
 
@@ -140,8 +142,11 @@ public class PictureController {
         // 查询数据库
         Picture picture = pictureService.getById(id);
         ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+        // 设置User
+        User user = userService.getById(picture.getUserId());
         // 转换成VO返回
         PictureVO pictureVO = PictureVO.objToVo(picture);
+        pictureVO.setUser(userService.getUserVO(user));
         return ResultUtils.success(pictureVO);
     }
 

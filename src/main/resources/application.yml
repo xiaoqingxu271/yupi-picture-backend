@@ -2,6 +2,10 @@ server:
   port: 8080
   servlet:
     context-path: /api
+    # cookie 配置
+    session:
+      cookie:
+        max-age: 2592000
 spring:
   application:
     name: yu-picture-backend
@@ -18,6 +22,10 @@ spring:
     password: root
     database: 4
     timeout: 5000
+  # session 配置
+  session:
+    store-type: redis
+    timeout: 2592000
 mybatis-plus:
   configuration:
     # 是否开启驼峰命名映射

@@ -31,7 +31,6 @@ public class Picture implements Serializable {
      */
     private String thumbnailUrl;
 
-
     /**
      * 图片名称
      */
@@ -96,6 +95,11 @@ public class Picture implements Serializable {
      * 审核人 ID
      */
     private Long reviewerId;
+
+    /**
+     * 所属空间 id
+     */
+    private Long spaceId;
 
     /**
      * 审核时间

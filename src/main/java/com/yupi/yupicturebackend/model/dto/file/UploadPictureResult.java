@@ -49,8 +49,13 @@ public class UploadPictureResult {
   
     /**  
      * 图片格式  
-     */  
-    private String picFormat;  
+     */
+    private String picFormat;
+
+    /**
+     * 图片色调
+     */
+    private String picColor;
   
 }
 

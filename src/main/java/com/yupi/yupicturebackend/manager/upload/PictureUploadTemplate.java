@@ -91,7 +91,7 @@ public abstract class PictureUploadTemplate {
                     thumbnailCiObject = objectList.get(1);
                 }
                 // 封装压缩后的图片信息
-                return buildResult(originalFilename, compressedCiObject, thumbnailCiObject);
+                return buildResult(originalFilename, compressedCiObject, thumbnailCiObject, imageInfo);
             }
             return buildResult(imageInfo, uploadPath, originalFilename, file);
         } catch (Exception e) {
@@ -106,7 +106,7 @@ public abstract class PictureUploadTemplate {
     }
 
     private UploadPictureResult buildResult(String originalFilename, CIObject compressedCiObject,
-                                            CIObject thumbnailCiObject) {
+                                            CIObject thumbnailCiObject, ImageInfo imageInfo) {
         int PicHeight = compressedCiObject.getHeight();
         int PicWidth = compressedCiObject.getWidth();
         double scale = NumberUtil.round(PicWidth * 1.0 / PicHeight, 2).doubleValue();
@@ -119,6 +119,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(PicHeight);
         uploadPictureResult.setPicScale(scale);
         uploadPictureResult.setPicFormat(compressedCiObject.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         uploadPictureResult.setThumbnailUrl(cosClientConfig.getHost() + "/" + thumbnailCiObject.getKey());
         return uploadPictureResult;
     }
@@ -168,6 +169,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(PicHeight);
         uploadPictureResult.setPicScale(scale);
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         return uploadPictureResult;
     }
 

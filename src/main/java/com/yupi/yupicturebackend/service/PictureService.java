@@ -9,6 +9,7 @@ import com.yupi.yupicturebackend.model.entity.User;
 import com.yupi.yupicturebackend.model.vo.PictureVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author chun0
@@ -114,4 +115,23 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser          当前登录用户
      */
     void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 按照颜色相似度查询图片
+     *
+     * @param spaceId   spaceId
+     * @param picColor  颜色
+     * @param loginUser 登录的用户
+     * @return 图片 vo 结合
+     */
+    List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+
+
+    /**
+     * 批量更新
+     *
+     * @param pictureEditByBatchRequest pictureEditByBatchRequest
+     * @param loginUser                 登录的用户
+     */
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 }

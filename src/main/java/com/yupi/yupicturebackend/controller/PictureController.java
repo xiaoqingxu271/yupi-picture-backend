@@ -5,7 +5,10 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.qcloud.cos.model.ciModel.image.ImageSearchRequest;
 import com.yupi.yupicturebackend.annotation.AuthCheck;
+import com.yupi.yupicturebackend.api.imagesearch.ImageSearchApiFacade;
+import com.yupi.yupicturebackend.api.imagesearch.model.ImageSearchResult;
 import com.yupi.yupicturebackend.common.BaseResponse;
 import com.yupi.yupicturebackend.common.DeleteRequest;
 import com.yupi.yupicturebackend.common.ResultUtils;
@@ -141,9 +144,9 @@ public class PictureController {
     /**
      * 根据id获取图片 （仅管理员可用）
      *
-     * @param id
-     * @param request
-     * @return
+     * @param id 图片id
+     * @param request HttpServletRequest对象，用于获取登录用户信息
+     * @return  图片
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -160,9 +163,9 @@ public class PictureController {
     /**
      * 根据id获取用户vo信息， （这是给普通用户的）
      *
-     * @param id
-     * @param request
-     * @return
+     * @param id 图片id
+     * @param request HttpServletRequest对象，用于获取登录用户信息
+     * @return 图片VO
      */
     @GetMapping("/get/vo")
     public BaseResponse<PictureVO> getPictureVOById(long id, HttpServletRequest request) {
@@ -295,9 +298,9 @@ public class PictureController {
     /**
      * 编辑图片信息，给用户自己使用
      *
-     * @param pictureEditRequest
-     * @param request
-     * @return
+     * @param pictureEditRequest 图片编辑的请求体
+     * @param request HttpServletRequest对象，用于获取登录用户信息
+     * @return 是否编辑成功
      */
     @PostMapping("/edit")
     public BaseResponse<Boolean> editPicture(@RequestBody PictureEditRequest pictureEditRequest,
@@ -329,9 +332,9 @@ public class PictureController {
     /**
      * 图片审核
      *
-     * @param pictureReviewRequest
-     * @param request
-     * @return
+     * @param pictureReviewRequest 图片审核的请求体
+     * @param request HttpServletRequest对象，用于获取登录用户信息
+     * @return 是否审核成功
      */
     @PostMapping("/review")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -344,6 +347,12 @@ public class PictureController {
         return ResultUtils.success(true);
     }
 
+    /**
+     * 批量抓取图片上传
+     * @param pictureUploadByBatchRequest 图片上传的请求体
+     * @param request HttpServletRequest对象，用于获取登录用户信息
+     * @return 上传成功的图片数量
+     */
     @PostMapping("/upload/batch")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Integer> uploadPictureBatch(
@@ -354,6 +363,22 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         Integer uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(uploadCount);
+    }
+
+    /**
+     * 以图搜图
+     * @param searchPictureByPictureRequest 图片id
+     * @return 图片搜索结果
+     */
+    @PostMapping("/search/picture")
+    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(@RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
+        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+        Long pictureId = searchPictureByPictureRequest.getPictureId();
+        Picture oldPicture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+        String oldPictureUrl = oldPicture.getUrl();
+        List<ImageSearchResult> imageSearchResults = ImageSearchApiFacade.getImagePageUrl(oldPictureUrl);
+        return ResultUtils.success(imageSearchResults);
     }
 
 }

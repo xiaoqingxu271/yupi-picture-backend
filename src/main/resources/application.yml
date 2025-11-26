@@ -12,7 +12,7 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yu_picture?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/yu_picture?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
   # redis 配置

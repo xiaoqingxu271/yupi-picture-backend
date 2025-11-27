@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yupi.yupicturebackend.constant.UserConstant;
 import com.yupi.yupicturebackend.exception.BusinessException;
 import com.yupi.yupicturebackend.exception.ErrorCode;
 import com.yupi.yupicturebackend.exception.ThrowUtils;
@@ -131,15 +132,13 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     @Override
     public void fillSpaceBySpaceLevel(Space space) {
         SpaceLevelEnum spaceLevelEnum = SpaceLevelEnum.getEnumByValue(space.getSpaceLevel());
-        if (spaceLevelEnum != null) {
-            long maxSize = spaceLevelEnum.getMaxSize();
-            if (space.getMaxSize() != null) {
-                space.setMaxSize(maxSize);
-            }
-            long maxCount = spaceLevelEnum.getMaxCount();
-            if (space.getMaxCount() != null) {
-                space.setMaxCount(maxCount);
-            }
+        long maxSize = spaceLevelEnum.getMaxSize();
+        if (space.getMaxSize() == null) {
+            space.setMaxSize(maxSize);
+        }
+        long maxCount = spaceLevelEnum.getMaxCount();
+        if (space.getMaxCount() == null) {
+            space.setMaxCount(maxCount);
         }
     }
 
@@ -164,7 +163,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建此级别的空间");
         }
         // 4, 控制同一用户只能创建一个私有空间
-        Object lock = lockMap.computeIfAbsent(loginUser.getId(), key -> new ObjUtil());
+        Object lock = lockMap.computeIfAbsent(loginUser.getId(), key -> new Object());
         synchronized (lock) {
             try {
                 // 5, 操作数据库，插入数据
@@ -184,6 +183,14 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
             }
         }
 
+    }
+
+    @Override
+    public void checkSpaceAuth(Space space, User loginUser) {
+        // 判断当前空间是否是本人创建的空间或者当前用户是管理员
+        if (!space.getUserId().equals(loginUser.getId()) && !loginUser.getUserRole().equals(UserConstant.ADMIN_ROLE)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
     }
 }
 

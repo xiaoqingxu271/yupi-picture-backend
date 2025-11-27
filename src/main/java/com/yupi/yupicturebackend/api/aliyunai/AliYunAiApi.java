@@ -31,8 +31,7 @@ public class AliYunAiApi {
             ".com/api/v1/services/aigc/image2image/out-painting";
 
     // 查询任务的地址
-    public static final String GET_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs" +
-            ".com/api/v1/services/aigc/image2image/out-painting/tasks/%s";
+    public static final String GET_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/%s";
 
     /**
      * 创建任务

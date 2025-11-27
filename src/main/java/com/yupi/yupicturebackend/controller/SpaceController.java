@@ -70,14 +70,12 @@ public class SpaceController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 获取当前登录用户
-        User user = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         Long spaceId = deleteRequest.getId();
         Space oldSpace = spaceService.getById(spaceId);
         ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
         // 判断当前空间是否是本人创建的空间或者当前用户是管理员
-        if (!oldSpace.getUserId().equals(user.getId()) && !user.getUserRole().equals(UserConstant.ADMIN_ROLE)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
+        spaceService.checkSpaceAuth(oldSpace, loginUser);
         // 操作数据库
         boolean result = spaceService.removeById(spaceId);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -222,10 +220,7 @@ public class SpaceController {
         Space oldSpace = spaceService.getById(spaceEditRequest.getId());
         ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
         // 判断当前编辑空间的用户是否是当前空间的上传者或者是管理员
-        User user = userService.getLoginUser(request);
-        if (!oldSpace.getUserId().equals(user.getId()) && !user.getUserRole().equals(UserConstant.ADMIN_ROLE)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
+        spaceService.checkSpaceAuth(space, loginUser);
         // 操作数据库
         boolean result = spaceService.updateById(space);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yupi.yupicturebackend.constant.UserConstant;
 import com.yupi.yupicturebackend.exception.BusinessException;
 import com.yupi.yupicturebackend.exception.ErrorCode;
+import com.yupi.yupicturebackend.manager.auth.StpKit;
 import com.yupi.yupicturebackend.mapper.UserMapper;
 import com.yupi.yupicturebackend.model.dto.user.UserQueryRequest;
 import com.yupi.yupicturebackend.model.entity.User;
@@ -23,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.yupi.yupicturebackend.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * @author chun0
@@ -94,16 +97,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             // 不存在
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码错误");
         }
-        // 4,存在保存用户状态信息
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
-        // 5,返回登录用户的信息
-        return getLoginUserVO(user);
+        // 4. 记录用户的登录态
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        // 5. 记录用户登录态到 Sa-token，便于空间鉴权时使用，注意保证该用户信息与 SpringSession 中的信息过期时间一致
+        StpKit.SPACE.login(user.getId());
+        StpKit.SPACE.getSession().set(USER_LOGIN_STATE, user);
+        return this.getLoginUserVO(user);
+
     }
 
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 从session中获取登录用户
-        User currentUser = (User) request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
@@ -118,12 +124,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean userLogout(HttpServletRequest request) {
         // 从session中获取登录用户
-        Object attribute = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
-        if (attribute == null) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除session中的登录用户
-        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        StpKit.SPACE.logout(((User) userObj).getId());
         return true;
     }
 

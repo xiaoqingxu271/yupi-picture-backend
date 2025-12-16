@@ -80,9 +80,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
             // 必须是空间的管理员才可以上传
-            if (!loginUser.getId().equals(space.getUserId())) {
-                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
-            }
+//            if (!loginUser.getId().equals(space.getUserId())) {
+//                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
+//            }
             // 校验额度
             if (space.getTotalCount() >= space.getMaxCount()) {
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, "空间条数不足");
@@ -102,8 +102,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             Picture oldPicture = this.getById(pictureId);
             ThrowUtils.throwIf(oldPicture == null, ErrorCode.PARAMS_ERROR, "图片不存在");
             // 校验更新的图片是由本人上传或者是管理员
-            ThrowUtils.throwIf(!oldPicture.getUserId().equals(loginUser.getId())
-                    || !userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR);
+//            ThrowUtils.throwIf(!oldPicture.getUserId().equals(loginUser.getId())
+//                    || !userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR);
 //            boolean exists = this.lambdaQuery()
 //                    .eq(Picture::getId, pictureId)
 //                    .exists();
